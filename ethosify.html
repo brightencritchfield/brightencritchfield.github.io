@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ethosify — Decision Training for Student Leaders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy:#1B2B5E; --navy-deep:#0F1A3C; --gold:#C99A2E; --gold-lt:#F5E6C0; --gold-md:#E8D09A;
+  --slate:#4A5568; --bg:#F7F4EF; --white:#FFFFFF;
+  --ok-bg:#EAF3DE; --ok-txt:#27500A; --ok-border:rgba(39,80,10,.2);
+  --mid-bg:#FAEEDA; --mid-txt:#633806; --mid-border:rgba(99,56,6,.2);
+  --bad-bg:#FCEBEB; --bad-txt:#791F1F; --bad-border:rgba(121,31,31,.2);
+  --blue-lt:#E6F1FB; --blue-txt:#0C447C;
+  --r-xl:20px; --r-lg:14px; --r-md:10px;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:#2D3748;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--navy);padding:0 2rem;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.logo{font-family:var(--font-body);font-size:21px;font-weight:700;letter-spacing:.07em;cursor:pointer;user-select:none;text-decoration:none}
+.logo-e{color:var(--gold)}.logo-i{color:#fff}
+.topbar-sub{font-size:13px;color:rgba(255,255,255,.42);letter-spacing:.02em}
+
+/* ── STAGE BAR ── */
+.stage-bar{background:#fff;border-bottom:1px solid rgba(27,43,94,.08);padding:.65rem 2rem;display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none}
+.stage-bar::-webkit-scrollbar{display:none}
+.stage-step{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#9AA3B0;padding:4px 10px;border-radius:99px;white-space:nowrap;transition:all .2s}
+.stage-step.done{color:var(--ok-txt);background:var(--ok-bg)}
+.stage-step.active{color:var(--navy);background:var(--gold-lt)}
+.stage-sep{font-size:13px;color:#DDD;padding:0 2px;flex-shrink:0}
+
+/* ── LAYOUT ── */
+.page{max-width:860px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+.narrow{max-width:700px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.flow{max-width:720px;margin:0 auto;padding:1.5rem 1.5rem 5rem}
+.survey-wrap{max-width:700px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.hidden{display:none!important}
+
+/* ── TYPE ── */
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.display{font-family:var(--font-display);font-size:34px;color:var(--navy);line-height:1.15;margin-bottom:.75rem}
+.display-sm{font-family:var(--font-display);font-size:24px;color:var(--navy);line-height:1.25;margin-bottom:.5rem}
+.lead{font-size:16px;color:var(--slate);line-height:1.7}
+.body-t{font-size:15px;color:#374151;line-height:1.85}
+.body-t p{margin-bottom:1rem}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:var(--r-md);padding:13px 28px;font-size:15px;font-weight:600;font-family:var(--font-body);cursor:pointer;transition:all .15s;letter-spacing:.01em;text-decoration:none;border:none}
+.btn-p{background:var(--navy);color:#fff}.btn-p:hover{background:#253980;transform:translateY(-1px)}
+.btn-p:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-o{background:transparent;color:var(--navy);border:1.5px solid rgba(27,43,94,.25)}.btn-o:hover{background:rgba(27,43,94,.05)}
+.btn-row{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-top:1.5rem}
+.ghost{background:none;border:none;font-size:13px;color:#9AA3B0;text-decoration:underline;cursor:pointer;font-family:var(--font-body)}.ghost:hover{color:#6B7280}
+
+/* ── CARDS ── */
+.card{background:var(--white);border-radius:var(--r-xl);padding:1.75rem 2rem;border:1px solid rgba(27,43,94,.07);margin-bottom:1.25rem}
+.card-flush{background:var(--white);border-radius:var(--r-xl);overflow:hidden;border:1px solid rgba(27,43,94,.07);margin-bottom:1.25rem}
+.card-inner{padding:1.5rem 1.75rem}
+.tag{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
+.divider{height:1px;background:rgba(27,43,94,.08);margin:1.5rem 0}
+.qblock{border-left:3px solid var(--gold);padding:.75rem 1.25rem;margin:.5rem 0;background:var(--gold-lt);font-style:italic;color:var(--navy);font-size:15px;line-height:1.55;border-radius:0 8px 8px 0}
+.instr-box{border-left:3px solid #185FA5;border-radius:0 10px 10px 0;padding:.9rem 1.25rem;margin-bottom:1.75rem;font-size:14px;line-height:1.65;background:var(--blue-lt);color:var(--blue-txt)}
+.instr-box.green{background:var(--ok-bg);border-color:var(--ok-txt);color:var(--ok-txt)}
+.instr-box.gold{background:var(--gold-lt);border-color:var(--gold);color:#7A5A10}
+
+/* ── PROGRESS ── */
+.sp-label{font-size:13px;color:var(--slate);font-weight:500;margin-bottom:.4rem}
+.sp-track{background:rgba(27,43,94,.08);border-radius:99px;height:6px;overflow:hidden;max-width:420px}
+.sp-fill{height:100%;background:linear-gradient(90deg,var(--gold),#E8B84B);border-radius:99px;transition:width .5s ease}
+
+/* ── SCENARIO GRID ── */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem;margin-top:1.5rem}
+.scard{background:var(--white);border:1.5px solid rgba(27,43,94,.1);border-radius:var(--r-xl);overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;position:relative}
+.scard:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(27,43,94,.13);border-color:rgba(201,154,46,.5)}
+.scard.done{border-color:rgba(39,80,10,.3)}.scard.locked{opacity:.48;cursor:not-allowed;pointer-events:none}
+.scard-img{width:100%;display:block}
+.scard-body{padding:1.25rem}
+.sbadge{display:inline-flex;align-items:center;font-size:11px;font-weight:700;letter-spacing:.06em;padding:3px 10px;border-radius:99px;margin-bottom:.6rem}
+.badge-avail{background:var(--gold-lt);color:#7A5A10}.badge-done{background:var(--ok-bg);color:var(--ok-txt)}.badge-locked{background:#EEE;color:#AAA}
+.scard-title{font-family:var(--font-display);font-size:19px;color:var(--navy);margin-bottom:.4rem;line-height:1.2}
+.scard-hook{font-size:13px;color:var(--slate);line-height:1.55;margin-bottom:.9rem}
+.scard-meta{display:flex;gap:1rem;font-size:12px;color:#9AA3B0;font-weight:500}
+.scard-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .2s}
+.scard:hover .scard-bar{transform:scaleX(1)}
+
+/* ── SURVEY ITEMS ── */
+.q-card{background:var(--white);border:1.5px solid rgba(27,43,94,.1);border-radius:var(--r-lg);padding:1.4rem 1.6rem;margin-bottom:1rem;transition:border-color .15s}
+.q-card.answered{border-color:rgba(27,43,94,.22)}
+.q-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:1rem}
+.q-num{font-size:12px;font-weight:700;color:#9AA3B0;min-width:28px;padding-top:1px}
+.q-construct{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;margin-bottom:3px}
+.q-text{font-size:14.5px;color:var(--navy);line-height:1.6;font-weight:500}
+.likert-wrap{padding-left:38px}
+.likert-hdr{display:flex;justify-content:space-between;font-size:11px;color:#9AA3B0;margin-bottom:5px}
+.likert-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.l-opt{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:transform .1s}
+.l-opt:hover{transform:translateY(-1px)}
+.l-circle{width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(27,43,94,.2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#6B7280;transition:all .15s;background:var(--white)}
+.l-opt:hover .l-circle{border-color:var(--gold);background:var(--gold-lt);color:#7A5A10}
+.l-circle.sel-pre{background:var(--navy);border-color:var(--navy);color:#fff}
+.l-circle.sel-post{background:#27500A;border-color:#27500A;color:#fff}
+.l-val{font-size:9px;color:#9AA3B0;text-align:center;line-height:1.3}
+
+/* ── DEMOGRAPHICS ── */
+.demo-card{background:var(--white);border:1.5px solid rgba(27,43,94,.1);border-radius:var(--r-lg);padding:1.4rem 1.6rem;margin-bottom:1rem}
+.demo-label{font-size:14.5px;color:var(--navy);font-weight:600;margin-bottom:.85rem;line-height:1.5}
+.demo-options{display:flex;flex-direction:column;gap:.5rem}
+.demo-option{display:flex;align-items:center;gap:10px;padding:.65rem .9rem;border:1.5px solid rgba(27,43,94,.12);border-radius:var(--r-md);cursor:pointer;transition:all .15s;font-size:14px;color:#374151;user-select:none}
+.demo-option:hover{border-color:rgba(201,154,46,.5);background:#FDFAF4}
+.demo-option.sel{border-color:var(--navy);background:var(--blue-lt);color:var(--navy);font-weight:600}
+.demo-radio{width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid rgba(27,43,94,.25);display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.demo-option.sel .demo-radio{border-color:var(--navy);background:var(--navy)}
+.demo-radio-dot{width:6px;height:6px;border-radius:50%;background:#fff}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.check-opt{display:flex;align-items:center;gap:8px;padding:.6rem .9rem;border:1.5px solid rgba(27,43,94,.12);border-radius:var(--r-md);cursor:pointer;transition:all .15s;font-size:13px;color:#374151;user-select:none}
+.check-opt:hover{border-color:rgba(201,154,46,.5);background:#FDFAF4}
+.check-opt.sel{border-color:var(--navy);background:var(--blue-lt);color:var(--navy);font-weight:600}
+.check-box{width:18px;height:18px;min-width:18px;border-radius:4px;border:2px solid rgba(27,43,94,.25);display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .15s;flex-shrink:0}
+.check-opt.sel .check-box{border-color:var(--navy);background:var(--navy);color:#fff}
+.demo-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.demo-row .demo-option{flex:1 1 140px}
+
+/* ── OPEN ENDED ── */
+.oe-card{background:var(--white);border:1.5px solid rgba(27,43,94,.1);border-radius:var(--r-lg);padding:1.4rem 1.6rem;margin-bottom:1rem}
+.oe-construct{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem}
+.oe-text{font-size:14.5px;color:var(--navy);line-height:1.6;font-weight:500;margin-bottom:.85rem}
+.oe-ta{width:100%;border:1.5px solid rgba(27,43,94,.15);border-radius:var(--r-md);padding:.85rem 1rem;font-size:14px;font-family:var(--font-body);resize:vertical;min-height:90px;color:#374151;line-height:1.6;outline:none;transition:border-color .15s;background:var(--white)}
+.oe-ta:focus{border-color:var(--gold)}
+
+/* ── SCENARIO FLOW ── */
+.crumb{display:flex;align-items:center;gap:8px;font-size:12px;color:#9AA3B0;margin-bottom:2rem;font-weight:500}
+.crumb-link{color:var(--gold);cursor:pointer}.crumb-sep{color:#CCC}
+.tab-bar{display:flex;gap:4px;background:rgba(27,43,94,.06);border-radius:12px;padding:4px;margin-bottom:1.5rem}
+.tab{flex:1;padding:8px 12px;border-radius:9px;border:none;background:none;font-size:13px;font-weight:600;font-family:var(--font-body);color:var(--slate);cursor:pointer;transition:all .15s;text-align:center}
+.tab.on{background:var(--white);color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.dprompt{font-family:var(--font-display);font-size:22px;color:var(--navy);margin-bottom:1.5rem;line-height:1.3}
+.cgrid{display:flex;flex-direction:column;gap:.75rem}
+.choice{background:var(--white);border:1.5px solid rgba(27,43,94,.12);border-radius:var(--r-lg);padding:1.1rem 1.4rem;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:14px;user-select:none}
+.choice:hover{border-color:rgba(201,154,46,.6);background:#FDFAF4;transform:translateX(4px)}
+.choice.chosen{border-color:var(--gold);background:var(--gold-lt)}
+.choice.dim{opacity:.4;pointer-events:none}
+.ckey{width:32px;height:32px;min-width:32px;border-radius:50%;background:rgba(27,43,94,.07);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--navy);transition:all .15s;flex-shrink:0}
+.choice.chosen .ckey{background:var(--gold);color:#fff}
+.clabel{font-size:15px;line-height:1.5;color:#374151}
+.choice.chosen .clabel{color:var(--navy);font-weight:600}
+.fcard{border-radius:var(--r-lg);padding:1.5rem 1.75rem;margin-bottom:1.25rem}
+.f-ok{background:var(--ok-bg);border:1px solid var(--ok-border)}
+.f-mid{background:var(--mid-bg);border:1px solid var(--mid-border)}
+.f-bad{background:var(--bad-bg);border:1px solid var(--bad-border)}
+.ftitle{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
+.f-ok .ftitle{color:var(--ok-txt)}.f-mid .ftitle{color:var(--mid-txt)}.f-bad .ftitle{color:var(--bad-txt)}
+.fbody{font-size:15px;line-height:1.7;color:#374151}
+.consq{display:flex;align-items:flex-start;gap:10px;margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(0,0,0,.07)}
+.consq-txt{font-size:13px;color:#6B7280;line-height:1.5;font-style:italic}
+.rl{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:.5rem}
+.rta{width:100%;border:1.5px solid rgba(27,43,94,.15);border-radius:var(--r-md);padding:.9rem 1rem;font-size:15px;font-family:var(--font-body);resize:vertical;min-height:100px;color:#374151;line-height:1.6;outline:none;transition:border-color .15s;background:var(--white)}
+.rta:focus{border-color:var(--gold)}
+.cval{font-size:32px;font-weight:700;color:var(--navy);text-align:center;margin:.4rem 0}
+.conf-slider{width:100%;accent-color:var(--navy);margin:.4rem 0}
+.cends{display:flex;justify-content:space-between;font-size:11px;color:#9AA3B0;margin-top:3px}
+.conf-grid{display:grid;grid-template-columns:1fr 130px;gap:1.5rem;align-items:center}
+.dots{display:flex;gap:6px;margin-bottom:1.5rem}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(27,43,94,.15)}
+.dot.on{background:var(--gold)}.dot.done-d{background:var(--navy)}
+.imeta{display:flex;gap:1.5rem;margin:1.25rem 0;flex-wrap:wrap}
+.mi{font-size:13px;color:var(--slate)}.mi strong{color:var(--navy);font-weight:700}
+.di-ok{background:rgba(201,154,46,.08);border-left:3px solid var(--gold);padding:1rem 1.25rem;border-radius:0 10px 10px 0;margin-bottom:.75rem}
+.di-ca{background:rgba(27,43,94,.05);border-left:3px solid var(--navy);padding:1rem 1.25rem;border-radius:0 10px 10px 0}
+.il{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.35rem}
+.il-g{color:var(--gold)}.il-n{color:var(--navy)}
+.it{font-size:15px;color:#374151;line-height:1.6}
+
+/* ── RESULTS ── */
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;margin:1.5rem 0}
+.sstat{background:var(--white);border-radius:var(--r-lg);padding:1.25rem;border:1px solid rgba(27,43,94,.08);text-align:center}
+.snum{font-family:var(--font-display);font-size:36px;color:var(--navy);line-height:1;margin-bottom:.3rem}
+.slbl{font-size:12px;color:var(--slate);font-weight:500}
+.acard{background:var(--white);border-radius:var(--r-lg);padding:1.4rem 1.6rem;border:1px solid rgba(27,43,94,.08);margin-bottom:1rem;border-left:4px solid var(--gold)}
+.atitle{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.abody{font-size:15px;color:#374151;line-height:1.65}
+.atrack{background:rgba(27,43,94,.07);border-radius:99px;height:10px;overflow:hidden}
+.afill{height:100%;background:var(--navy);border-radius:99px;transition:width 1.2s ease}
+.legend-row{display:flex;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--slate);font-weight:500}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+.compare-bar-wrap{margin-bottom:.85rem}
+.compare-lbl{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:.4rem;display:flex;justify-content:space-between;align-items:center}
+.cbar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.cbar-tag{font-size:11px;color:#9AA3B0;width:32px;text-align:right;font-weight:600}
+.cbar-track{flex:1;background:rgba(27,43,94,.07);border-radius:99px;height:10px;overflow:hidden}
+.cbar-fill{height:100%;border-radius:99px;transition:width 1s ease}
+.cbar-fill.pre{background:#9AA3B0}
+.cbar-fill.post{background:var(--navy)}
+.cbar-val{font-size:12px;font-weight:700;width:30px;color:var(--slate)}
+.delta-pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+.delta-pos{background:var(--ok-bg);color:var(--ok-txt)}
+.delta-neg{background:var(--bad-bg);color:var(--bad-txt)}
+.delta-neu{background:#F5F5F5;color:#6B7280}
+.howcard{background:var(--white);border-radius:var(--r-lg);padding:1.5rem 1.75rem;border:1px solid rgba(27,43,94,.08);margin-top:2.5rem}
+.howstep{display:flex;gap:14px;align-items:flex-start;padding:.6rem 0}
+.hnum{width:28px;height:28px;min-width:28px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.htxt{font-size:14px;color:var(--slate);line-height:1.6}
+
+/* ── TIMELINE ── */
+.timeline-wrap{position:relative;padding-left:0}
+.timeline-line{position:absolute;left:18px;top:18px;bottom:18px;width:2px;background:linear-gradient(180deg,#5DCAA5,#C99A2E,#E24B4A,#A32D2D);border-radius:1px}
+.timeline-item{display:flex;gap:14px;margin-bottom:14px;position:relative}
+.timeline-num{width:36px;height:36px;min-width:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:white;font-weight:700;z-index:1;flex-shrink:0}
+.timeline-content{padding-top:4px}
+.timeline-week{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;margin-bottom:2px}
+.timeline-label{font-size:14px;color:#374151;line-height:1.5}
+
+/* ── COMPLETE BOX ── */
+.complete-box{background:var(--ok-bg);border:1px solid rgba(39,80,10,.2);border-radius:var(--r-lg);padding:1.25rem 1.5rem;margin-top:1.5rem}
+.complete-box-title{font-size:13px;font-weight:700;color:var(--ok-txt);margin-bottom:.4rem}
+.complete-box-body{font-size:14px;color:#374151;margin-bottom:1rem}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fadeUp .35s ease forwards}
+@keyframes pop{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+.pop{animation:pop .25s ease forwards}
+
+/* ── DECISION PATH SVG ── */
+.decision-path{width:100%;height:auto;margin-bottom:.75rem}
+
+/* ── WELCOME FEATURE LIST ── */
+.feature-list{background:var(--white);border-radius:var(--r-lg);padding:1.25rem 1.5rem;border:1px solid rgba(27,43,94,.08);max-width:520px;margin-bottom:2rem}
+.feature-row{display:flex;gap:12px;padding:.5rem 0;border-top:1px solid rgba(27,43,94,.06)}
+.feature-row:first-child{border-top:none}
+.feature-time{font-size:12px;font-weight:700;color:var(--gold);min-width:52px}
+.feature-desc{font-size:14px;color:var(--slate)}
+
+/* ── INTERP TABLE ── */
+.interp-row{display:flex;gap:10px;margin-bottom:6px;align-items:center}
+.interp-badge{border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;min-width:95px;text-align:center}
+.interp-desc{font-size:13px;color:#374151}
+
+/* responsive */
+@media(max-width:600px){
+  .topbar{padding:0 1rem}
+  .page,.narrow,.flow,.survey-wrap{padding-left:1rem;padding-right:1rem}
+  .conf-grid{grid-template-columns:1fr}
+  .check-grid{grid-template-columns:1fr}
+  .display{font-size:26px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a class="logo" onclick="goWelcome()"><span class="logo-e">ETHOS</span><span class="logo-i">IFY</span></a>
+  <div class="topbar-sub">Higher Education · Decision Training</div>
+</div>
+
+<!-- STAGE BAR -->
+<div class="stage-bar" id="stage-bar" style="display:none">
+  <div class="stage-step" id="stage-demographics">Demographics</div>
+  <span class="stage-sep">›</span>
+  <div class="stage-step" id="stage-presurvey">Pre-Survey</div>
+  <span class="stage-sep">›</span>
+  <div class="stage-step" id="stage-scenarios">Training</div>
+  <span class="stage-sep">›</span>
+  <div class="stage-step" id="stage-postsurvey">Post-Survey</div>
+  <span class="stage-sep">›</span>
+  <div class="stage-step" id="stage-results">Results</div>
+</div>
+
+<!-- SCREENS -->
+<div id="screen-welcome"></div>
+<div id="screen-demographics" class="hidden"></div>
+<div id="screen-presurvey" class="hidden"></div>
+<div id="screen-scenarios" class="hidden"></div>
+<div id="screen-scenario-flow" class="hidden"></div>
+<div id="screen-postsurvey" class="hidden"></div>
+<div id="screen-openended" class="hidden"></div>
+<div id="screen-results" class="hidden"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════
+
+const CONSTRUCTS = [
+  { id:"pattern",   label:"Pattern Recognition",  color:"#185FA5", dot:"#378ADD" },
+  { id:"awareness", label:"Behavioral Awareness",  color:"#0F6E56", dot:"#1D9E75" },
+  { id:"reporting", label:"Reporting Confidence",  color:"#854F0B", dot:"#BA7517" },
+  { id:"role",      label:"Role Clarity",          color:"#3C3489", dot:"#534AB7" },
+  { id:"judgment",  label:"Proportional Judgment", color:"#993C1D", dot:"#D85A30" },
+];
+
+const LIKERT_LABELS = ["Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"];
+
+const PRE_ITEMS = [
+  { id:"P1",  construct:"pattern",   text:"I can identify clusters of behavioral changes in a peer that may warrant attention, even when no single behavior is clearly alarming." },
+  { id:"P2",  construct:"pattern",   text:"I am able to recognize when a combination of statements, social withdrawal, and behavioral shifts in a peer represents a pattern worth taking seriously." },
+  { id:"P3",  construct:"awareness", text:"I am confident in my ability to distinguish between ordinary stress responses and behavioral patterns that may indicate a peer is struggling in a serious way." },
+  { id:"P4",  construct:"awareness", text:"I can identify verbal and non-verbal cues that suggest a peer's distress may go beyond typical academic or social pressure." },
+  { id:"P5",  construct:"reporting", text:"I know what campus reporting channels and resources are available to me if I become concerned about a peer's safety or well-being." },
+  { id:"P6",  construct:"reporting", text:"I feel prepared to take action and connect a peer of concern to an appropriate campus resource or support system." },
+  { id:"P7",  construct:"role",      text:"I understand the limits of my role as a student leader when responding to a peer who may be experiencing distress or displaying concerning behavior." },
+  { id:"P8",  construct:"role",      text:"I know when a situation involving a peer requires me to involve a professional rather than attempting to manage it on my own." },
+  { id:"P9",  construct:"judgment",  text:"I feel prepared to respond proportionally to ambiguous situations — neither dismissing early warning signs nor escalating them beyond what the evidence supports." },
+  { id:"P10", construct:"judgment",  text:"I can hold uncertainty in a situation involving a peer without either dismissing my concern prematurely or jumping to a worst-case response." },
+];
+
+const POST_ITEMS = [
+  { id:"Q1",  construct:"pattern",   text:"After this training, I feel more capable of identifying clusters of behavioral changes in a peer that may warrant attention, even when no single behavior is clearly alarming." },
+  { id:"Q2",  construct:"pattern",   text:"After this training, I am better able to recognize when a combination of statements, social withdrawal, and behavioral shifts represents a pattern worth taking seriously." },
+  { id:"Q3",  construct:"awareness", text:"After this training, I am more confident in my ability to distinguish between ordinary stress responses and behavioral patterns that may indicate serious struggle." },
+  { id:"Q4",  construct:"awareness", text:"After this training, I am better able to identify verbal and non-verbal cues that suggest a peer's distress may go beyond typical academic or social pressure." },
+  { id:"Q5",  construct:"reporting", text:"After this training, I have a clearer understanding of what campus reporting channels and resources are available and when it is appropriate to use them." },
+  { id:"Q6",  construct:"reporting", text:"After this training, I feel more prepared to take action and connect a peer of concern to an appropriate campus resource or support system." },
+  { id:"Q7",  construct:"role",      text:"After this training, I have a better understanding of the limits of my role as a student leader when responding to a peer of concern." },
+  { id:"Q8",  construct:"role",      text:"After this training, I have a clearer sense of when a situation requires me to involve a professional rather than attempting to manage it on my own." },
+  { id:"Q9",  construct:"judgment",  text:"After this training, I feel better prepared to respond proportionally to ambiguous situations — neither dismissing early warning signs nor over-escalating." },
+  { id:"Q10", construct:"judgment",  text:"After this training, I feel more able to hold uncertainty in a peer situation without dismissing my concern prematurely or jumping to worst-case framing." },
+];
+
+const OE_ITEMS = [
+  { id:"OE1", construct:"Transfer readiness",      text:"Describe a situation — real or hypothetical — in which you now feel better equipped to recognize a behavioral pattern. What specifically would you look for?" },
+  { id:"OE2", construct:"Role understanding",      text:"In your own words, what is the most important limit of a student leader's role when responding to a peer of concern? Has this changed after training?" },
+  { id:"OE3", construct:"Ambiguity & uncertainty", text:"What aspect of these scenarios did you find most difficult to navigate? What made it hard to feel confident in your response?" },
+  { id:"OE4", construct:"Reporting intention",     text:"If you encountered a situation like one of these scenarios, what would your next step be? Who on your campus would you contact?" },
+  { id:"OE5", construct:"Perceived learning",      text:"What is the single most important thing you are taking away from this training? How do you expect it to influence your response to concerning peer behavior?" },
+];
+
+const SCENARIOS = [
+  {
+    id:"s01", title:"The Concerning Classmate",
+    shortHook:"You've noticed changes in a peer, but nothing is explicitly threatening.",
+    ambiguityLevel:"Medium", estimatedMinutes:8, introFocus:"Pattern recognition and early support",
+    context:[
+      "You are the vice president of a student organization that meets weekly in the evenings. Earlier in the semester, Alex was engaged, social, and consistently involved. Over the past few weeks, Alex has become noticeably more withdrawn.",
+      "They now sit toward the edge of the room, avoid eye contact, and leave immediately after meetings. During a group discussion, Alex stated that people ignore things until it is too late and then act surprised when something happens.",
+      "Later that week, you noticed a social post from Alex that read: \"They'll regret ignoring me.\" Today, another member quietly tells you that Alex said they are tired of being overlooked and just want people to finally listen."
+    ],
+    quotes:['"People ignore things until it is too late."', '"They\'ll regret ignoring me."', '"I just want people to finally listen."'],
+    illustrationId:"illus-s01",
+    timeline:[
+      {w:"Weeks ago",l:"Engaged and social member of the group",c:"#5DCAA5"},
+      {w:"Recently", l:"Becoming withdrawn — sits at edges, leaves early",c:"#C99A2E"},
+      {w:"This week",l:"Makes concerning statements during discussion",c:"#E24B4A"},
+      {w:"Today",    l:"Peer quietly reports more concerning comments",c:"#A32D2D"},
+    ],
+    decisions:[
+      { id:"d01", prompt:"What is the most appropriate next step?",
+        options:[
+          {id:"A",label:"Wait and see if the behavior becomes more serious",fbTitle:"Consider this",fbBody:"Waiting for certainty narrows the window for early support. Situations like this are rarely clear at the beginning — which is why early attention matters.",consequence:"No one intervenes, and the pattern may continue or intensify.",cls:"risky",tags:["underreaction","delay"]},
+          {id:"B",label:"Check in with Alex privately",fbTitle:"Consider this",fbBody:"This shows care, but places you in an informal assessment role. Without broader support, you may carry more responsibility than you should.",consequence:"You gain limited information and still lack documentation or shared support.",cls:"partial",tags:["self_handling"]},
+          {id:"C",label:"Document what you've observed and consult a campus resource",fbTitle:"Strong decision",fbBody:"This recognizes a meaningful pattern without jumping to conclusions. It creates a pathway for support and review while keeping your role appropriate.",consequence:"The concern is shared with the right system before the situation becomes more serious.",cls:"optimal",tags:["pattern_recognition","early_support"]},
+          {id:"D",label:"Warn others in the group to be cautious around Alex",fbTitle:"Consider this",fbBody:"This may feel protective, but it can increase isolation and fear. Social distancing without context can worsen the situation rather than improve it.",consequence:"Group tension increases, and Alex may feel more shut out.",cls:"risky",tags:["overreaction","isolation"]},
+        ], reflectionPrompt:"Why did you choose this response?", confidencePrompt:"How confident are you in your decision?", ideal:"C"
+      },
+      { id:"d02", prompt:"How should you interpret what you've observed?",
+        options:[
+          {id:"A",label:"Normal stress or frustration",fbTitle:"Consider this",fbBody:"Stress is common, but repeated behavior changes and escalating statements deserve more attention than ordinary frustration.",consequence:"The pattern is minimized and less likely to be addressed.",cls:"risky",tags:["minimization","underreaction"]},
+          {id:"B",label:"A pattern that could indicate concern",fbTitle:"Strong decision",fbBody:"This focuses on behavior over time rather than a single comment. It leaves room for uncertainty while still taking the situation seriously.",consequence:"The situation is framed accurately enough for responsible next steps.",cls:"optimal",tags:["pattern_recognition"]},
+          {id:"C",label:"A serious and immediate threat",fbTitle:"Consider this",fbBody:"There isn't enough information here to justify the most extreme interpretation. Good judgment includes proportion as well as caution.",consequence:"The situation may be escalated too quickly without enough context.",cls:"risky",tags:["overreaction","threat_inflation"]},
+          {id:"D",label:"Not something you need to think about further",fbTitle:"Consider this",fbBody:"Student leaders have a responsibility to notice and respond when patterns emerge.",consequence:"The opportunity for early action is lost.",cls:"risky",tags:["disengagement","avoidance"]},
+        ], reflectionPrompt:"Why did you choose this response?", confidencePrompt:"How confident are you in your decision?", ideal:"B"
+      }
+    ],
+    debriefTitle:"Recognizing Patterns Early",
+    debriefSummary:"The most important skill here is recognizing patterns before they become more obvious. The goal is not to predict harm — it's to notice when changes in behavior, tone, and context add up to something that should not be ignored.",
+    keyInsight:"Early attention creates more options for support and prevention.",
+    cautionPoint:"Acting too quickly toward worst-case framing can escalate unnecessarily and increase harm.",
+  },
+  {
+    id:"s02", title:"Joking or Not?",
+    shortHook:"A comment is framed as humor, but the room doesn't all react the same way.",
+    ambiguityLevel:"High", estimatedMinutes:7, introFocus:"Navigating ambiguity and proportional response",
+    context:[
+      "You are leading a student leadership meeting during a particularly stressful point in the semester. Several members are joking about how exhausted they are. Jordan, who often uses sarcasm, leans back and says that if they fail this class they might just burn the place down.",
+      "A few people laugh immediately. Others go quiet. The conversation moves on, but the comment stays with you. Later that evening, one member messages you privately and says the comment did not feel like a joke.",
+      "You also remember that Jordan has made a few intense comments earlier in the semester, though each one was brushed off quickly."
+    ],
+    quotes:['"If I fail this class, I might just burn the place down."'],
+    illustrationId:"illus-s02",
+    timeline:[
+      {w:"Earlier semester",l:"Intense comments appeared but were dismissed",c:"#C99A2E"},
+      {w:"Today",           l:"Ambiguous comment during a stressful meeting",c:"#E24B4A"},
+      {w:"That evening",    l:"A peer says the comment didn't feel like a joke",c:"#A32D2D"},
+    ],
+    decisions:[
+      { id:"d01", prompt:"How should you interpret the comment?",
+        options:[
+          {id:"A",label:"Clearly just a joke",fbTitle:"Consider this",fbBody:"Humor can signal stress, deflection, or real frustration. Deciding it is only a joke without context can shut down useful judgment too early.",consequence:"The comment is dismissed before context is considered.",cls:"risky",tags:["dismissal","intent_bias"]},
+          {id:"B",label:"Something that depends on context and prior behavior",fbTitle:"Strong decision",fbBody:"This treats the statement proportionally. It doesn't overreact, but doesn't assume the wording means nothing.",consequence:"The situation remains open for clarification rather than dismissal.",cls:"optimal",tags:["context_reasoning","proportional_response"]},
+          {id:"C",label:"An immediate and serious threat",fbTitle:"Consider this",fbBody:"Jumping straight to the most extreme interpretation can create unnecessary escalation. Proportion matters when signals are still ambiguous.",consequence:"The response becomes more severe than the available information supports.",cls:"risky",tags:["overreaction","threat_inflation"]},
+          {id:"D",label:"Something to ignore unless it happens again",fbTitle:"Consider this",fbBody:"A single comment can still be important depending on timing, context, and how others experienced it.",consequence:"The opportunity for a low-risk response is missed.",cls:"partial",tags:["avoidance","delay"]},
+        ], reflectionPrompt:"Why did you choose this response?", confidencePrompt:"How confident are you in your decision?", ideal:"B"
+      },
+      { id:"d02", prompt:"What is the most appropriate response?",
+        options:[
+          {id:"A",label:"Do nothing",fbTitle:"Consider this",fbBody:"Inaction leaves the ambiguity unresolved and communicates that uncomfortable comments aren't worth revisiting.",consequence:"No context is gathered and no support is offered.",cls:"risky",tags:["avoidance","dismissal"]},
+          {id:"B",label:"Check in with Jordan privately after the meeting",fbTitle:"Strong decision",fbBody:"A calm private check-in is a proportionate next step. It allows you to gather context without escalating too quickly.",consequence:"You create space to clarify tone, stress, and context.",cls:"optimal",tags:["proportional_response","context_reasoning"]},
+          {id:"C",label:"Report the comment immediately without additional context",fbTitle:"Consider this",fbBody:"Reporting can be appropriate, but this skips a lower-intensity clarifying step that may still be responsible here.",consequence:"The response may feel abrupt relative to the information available.",cls:"partial",tags:["over_escalation"]},
+          {id:"D",label:"Tell other students to keep their distance",fbTitle:"Consider this",fbBody:"This increases stigma and tension without clarifying what actually happened.",consequence:"Jordan may become more isolated, and the group becomes more anxious.",cls:"risky",tags:["social_isolation","overreaction"]},
+        ], reflectionPrompt:"Why did you choose this response?", confidencePrompt:"How confident are you in your decision?", ideal:"B"
+      }
+    ],
+    debriefTitle:"Holding Uncertainty",
+    debriefSummary:"The key challenge is navigating ambiguity without collapsing into either dismissal or panic. Practice holding uncertainty long enough to respond proportionally.",
+    keyInsight:"Proportional responses require pausing to gather context before acting.",
+    cautionPoint:"Neither dismissing ambiguous signals nor jumping to worst-case framing serves the situation.",
+  },
+  {
+    id:"s03", title:"You Promised Not to Tell",
+    shortHook:"A close relationship makes responsible action feel emotionally costly.",
+    ambiguityLevel:"High", estimatedMinutes:9, introFocus:"Ethical judgment under relational pressure",
+    context:[
+      "Late one evening, you are sitting with a close friend after a long and difficult day. The conversation shifts from stress into anger. Your friend says they feel more upset than they have in a long time and starts describing a person who has deeply wronged them.",
+      "Their tone intensifies, and they say that sometimes they think about hurting that person because they get so angry they don't know what they would do.",
+      "Almost immediately, they pull back and say they should not have said that. They ask you not to tell anyone and emphasize that they trust you. You feel the weight of the relationship and the weight of what you just heard."
+    ],
+    quotes:['"Sometimes I think about hurting them."', '"Please do not tell anyone. I trust you."'],
+    illustrationId:"illus-s03",
+    timeline:[
+      {w:"Long day",   l:"Stressful conversation starts casually",c:"#5DCAA5"},
+      {w:"It shifts",  l:"Tone turns to anger about someone who wronged them",c:"#C99A2E"},
+      {w:"Disclosure", l:"Friend mentions thinking about hurting someone",c:"#E24B4A"},
+      {w:"Pulls back", l:"Asks you to keep it secret — cites your trust",c:"#A32D2D"},
+    ],
+    decisions:[
+      { id:"d01", prompt:"What should guide your decision-making first?",
+        options:[
+          {id:"A",label:"Maintaining the friendship and trust",fbTitle:"Consider this",fbBody:"Trust matters deeply, but not every promise can be kept in the same way when safety concerns enter the picture.",consequence:"The relationship is prioritized over broader well-being.",cls:"risky",tags:["loyalty_bias","misapplied_confidentiality"]},
+          {id:"B",label:"Ensuring safety and taking the concern seriously",fbTitle:"Strong decision",fbBody:"This keeps the situation grounded in care and responsibility. Some moments are bigger than the personal relationship alone.",consequence:"You orient toward support and responsible action rather than secrecy.",cls:"optimal",tags:["safety_priority","ethical_clarity"]},
+          {id:"C",label:"Avoiding involvement because it feels too complicated",fbTitle:"Consider this",fbBody:"Avoidance reduces discomfort in the moment, but it does not reduce risk.",consequence:"The concern remains unaddressed.",cls:"risky",tags:["avoidance","withdrawal"]},
+          {id:"D",label:"Respecting confidentiality above all else",fbTitle:"Consider this",fbBody:"Confidentiality is not absolute in every situation. Responsibility sometimes requires expanding who is involved.",consequence:"The promise becomes more important than the potential risk.",cls:"risky",tags:["misapplied_confidentiality","secrecy"]},
+        ], reflectionPrompt:"Why did you choose this response?", confidencePrompt:"How confident are you in your decision?", ideal:"B"
+      },
+      { id:"d02", prompt:"What is the most appropriate next action?",
+        options:[
+          {id:"A",label:"Keep the disclosure private",fbTitle:"Consider this",fbBody:"Keeping this entirely private leaves too much weight on you and too little support around the situation.",consequence:"Risk remains hidden and unsupported.",cls:"risky",tags:["secrecy","insufficient_escalation"]},
+          {id:"B",label:"Encourage your friend to get help but leave it entirely up to them",fbTitle:"Consider this",fbBody:"This is supportive, but still leaves too much responsibility on one person in a high-stakes moment.",consequence:"Some support is offered, but follow-through is uncertain.",cls:"partial",tags:["self_handling"]},
+          {id:"C",label:"Tell your friend you need to involve a campus resource and be transparent",fbTitle:"Strong decision",fbBody:"This balances honesty, care, and responsibility. It moves toward support instead of secrecy.",consequence:"A wider support structure can respond while you remain honest about your actions.",cls:"optimal",tags:["transparent_escalation","safety_priority"]},
+          {id:"D",label:"Distance yourself from the situation completely",fbTitle:"Consider this",fbBody:"Pulling away removes support without making the situation safer.",consequence:"Your friend becomes more isolated and the concern remains unresolved.",cls:"risky",tags:["withdrawal","avoidance"]},
+        ], reflectionPrompt:"Why did you choose this response?", confidencePrompt:"How confident are you in your decision?", ideal:"C"
+      }
+    ],
+    debriefTitle:"Ethical Judgment Under Pressure",
+    debriefSummary:"The emotionally easy answer and the responsible answer are not always the same thing. Effective leaders can hold both care and responsibility at once.",
+    keyInsight:"Transparency and care can coexist — you can honor the relationship while still seeking appropriate support.",
+    cautionPoint:"Confidentiality has limits when safety is a concern. Silence is not always loyalty.",
+  }
+];
+
+const ADAPTIVE = {
+  underreaction:"You tend to wait for clearer evidence before acting. In complex situations, earlier attention can create more options for support and prevention.",
+  overreaction:"You often move quickly toward the most serious interpretation. Strong judgment also requires proportion and context.",
+  self_handling:"You show care and initiative, but may be taking on roles that require broader support systems. Effective leaders connect concerns to the right channels.",
+  avoidance:"Several of your responses stepped away from the situation rather than engaging. Discomfort is part of responsible leadership.",
+  confidence_mismatch:"Your confidence is often higher than your decision accuracy. Slow down and notice which cues you are prioritizing.",
+  developing_confidence:"Your choices are often strong even when your confidence is lower. Continued practice should help your confidence catch up.",
+  balanced:"Your responses show a thoughtful balance of action, proportion, and care. Continue building on this foundation.",
+};
+const PATTERN_LABELS = {
+  underreaction:"Tendency to Underreact", overreaction:"Tendency to Overreact",
+  self_handling:"Self-Handling Bias", avoidance:"Avoidance Pattern",
+  confidence_mismatch:"Confidence Mismatch", developing_confidence:"Developing Confidence",
+  balanced:"Balanced Judgment"
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// SVG ILLUSTRATIONS
+// ═══════════════════════════════════════════════════════════════════
+
+const ILLUS_S01 = `<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+  <rect width="480" height="200" fill="#F0EDE8"/><rect x="0" y="155" width="480" height="45" fill="#E0DDD7"/>
+  <ellipse cx="240" cy="148" rx="160" ry="22" fill="#C9A87A" opacity="0.9"/>
+  <rect x="80" y="140" width="320" height="12" fill="#B8935E" rx="3"/>
+  <rect x="110" y="152" width="8" height="30" fill="#A07840" rx="2"/><rect x="362" y="152" width="8" height="30" fill="#A07840" rx="2"/>
+  <rect x="0" y="0" width="480" height="90" fill="#DDD9D2"/><rect x="160" y="12" width="160" height="70" fill="#C5C1BA" rx="4"/>
+  <text x="240" y="48" text-anchor="middle" font-size="10" fill="#8A8680" font-family="sans-serif">WHITEBOARD</text>
+  <g opacity="0.7"><circle cx="110" cy="108" r="18" fill="#E8C9A0"/><ellipse cx="110" cy="135" rx="15" ry="10" fill="#6B8DB5"/><circle cx="110" cy="104" r="7" fill="#C9956A"/><line x1="95" y1="118" x2="85" y2="130" stroke="#E8C9A0" stroke-width="4" stroke-linecap="round"/><line x1="125" y1="118" x2="135" y2="128" stroke="#E8C9A0" stroke-width="4" stroke-linecap="round"/></g>
+  <g opacity="0.75"><circle cx="185" cy="108" r="18" fill="#C9A87A"/><ellipse cx="185" cy="135" rx="15" ry="10" fill="#8B9E7A"/><circle cx="185" cy="104" r="7" fill="#A07840"/></g>
+  <circle cx="365" cy="108" r="26" fill="#C99A2E" opacity="0.15"/>
+  <circle cx="365" cy="108" r="18" fill="#D4A5A5"/><ellipse cx="365" cy="135" rx="15" ry="10" fill="#7A7A8A"/><circle cx="365" cy="104" r="7" fill="#B87878"/>
+  <line x1="350" y1="120" x2="342" y2="138" stroke="#D4A5A5" stroke-width="4" stroke-linecap="round"/><line x1="380" y1="120" x2="378" y2="138" stroke="#D4A5A5" stroke-width="4" stroke-linecap="round"/>
+  <text x="365" y="90" text-anchor="middle" font-size="9" fill="#C99A2E" font-family="sans-serif" font-weight="600">ALEX</text>
+  <rect x="248" y="58" width="200" height="34" rx="8" fill="#1B2B5E" opacity="0.92"/>
+  <polygon points="310,92 322,92 316,102" fill="#1B2B5E" opacity="0.92"/>
+  <text x="348" y="73" text-anchor="middle" font-size="8" fill="#F5E6C0" font-family="sans-serif" font-style="italic">"People ignore things</text>
+  <text x="348" y="85" text-anchor="middle" font-size="8" fill="#F5E6C0" font-family="sans-serif" font-style="italic">until it's too late."</text>
+  <line x1="220" y1="140" x2="348" y2="140" stroke="#C99A2E" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>
+  <text x="284" y="135" text-anchor="middle" font-size="8" fill="#C99A2E" font-family="sans-serif">withdrawn</text>
+  <g opacity="0.65"><circle cx="430" cy="115" r="16" fill="#A8C4B8"/><ellipse cx="430" cy="138" rx="13" ry="9" fill="#5A7A9A"/><circle cx="430" cy="111" r="6" fill="#80A898"/></g>
+</svg>`;
+
+const ILLUS_S02 = `<svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+  <rect width="480" height="190" fill="#EBE7E0"/><rect x="0" y="140" width="480" height="50" fill="#DDD9D2"/>
+  <ellipse cx="240" cy="148" rx="180" ry="24" fill="#C9A87A" opacity="0.85"/>
+  <rect x="60" y="138" width="360" height="14" fill="#B8935E" rx="3"/>
+  <circle cx="240" cy="100" r="22" fill="#A8C4B8" opacity="0.9"/><ellipse cx="240" cy="130" rx="18" ry="11" fill="#5A8878"/><circle cx="240" cy="95" r="9" fill="#80A898"/>
+  <text x="240" y="80" text-anchor="middle" font-size="9" fill="#5A8878" font-family="sans-serif" font-weight="600">JORDAN</text>
+  <rect x="258" y="52" width="195" height="38" rx="8" fill="#1B2B5E"/>
+  <polygon points="262,90 275,90 268,100" fill="#1B2B5E"/>
+  <text x="356" y="68" text-anchor="middle" font-size="8" fill="#F5E6C0" font-family="sans-serif" font-style="italic">"If I fail this class, I might</text>
+  <text x="356" y="80" text-anchor="middle" font-size="8" fill="#F5E6C0" font-family="sans-serif" font-style="italic">just burn the place down."</text>
+  <circle cx="130" cy="108" r="18" fill="#E8C9A0"/><ellipse cx="130" cy="133" rx="15" ry="10" fill="#6B8DB5"/><circle cx="130" cy="104" r="7" fill="#C9956A"/>
+  <text x="130" y="165" text-anchor="middle" font-size="8" fill="#6B8DB5" font-family="sans-serif">laughed</text>
+  <circle cx="370" cy="108" r="18" fill="#D4C5C5"/><ellipse cx="370" cy="133" rx="15" ry="10" fill="#8A7A8A"/><circle cx="370" cy="104" r="7" fill="#B8A8A8"/>
+  <text x="370" y="165" text-anchor="middle" font-size="8" fill="#8A7A8A" font-family="sans-serif">went quiet</text>
+  <line x1="155" y1="88" x2="345" y2="88" stroke="#C99A2E" stroke-width="0.75" stroke-dasharray="4,3" opacity="0.5"/>
+  <text x="250" y="83" text-anchor="middle" font-size="8" fill="#C99A2E" font-family="sans-serif">room divided</text>
+</svg>`;
+
+const ILLUS_S03 = `<svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+  <rect width="480" height="190" fill="#0F1520"/>
+  <circle cx="30" cy="20" r="1.5" fill="white" opacity="0.35"/><circle cx="80" cy="35" r="1.5" fill="white" opacity="0.35"/><circle cx="150" cy="15" r="1.5" fill="white" opacity="0.35"/><circle cx="260" cy="28" r="1.5" fill="white" opacity="0.35"/><circle cx="340" cy="18" r="1.5" fill="white" opacity="0.35"/><circle cx="420" cy="30" r="1.5" fill="white" opacity="0.35"/>
+  <circle cx="440" cy="35" r="22" fill="#F5E6C0" opacity="0.9"/><circle cx="452" cy="28" r="18" fill="#0F1520"/>
+  <rect x="80" y="125" width="320" height="50" rx="10" fill="#2A3050"/>
+  <rect x="80" y="105" width="60" height="70" rx="8" fill="#323855"/><rect x="340" y="105" width="60" height="70" rx="8" fill="#323855"/>
+  <circle cx="175" cy="98" r="20" fill="#C9A87A"/><ellipse cx="175" cy="120" rx="16" ry="10" fill="#4A5A7A"/><circle cx="175" cy="93" r="8" fill="#A07840"/>
+  <text x="175" y="80" text-anchor="middle" font-size="9" fill="#C99A2E" font-family="sans-serif" font-weight="600">YOU</text>
+  <circle cx="305" cy="98" r="20" fill="#D4A5A5"/><ellipse cx="305" cy="120" rx="16" ry="10" fill="#6A5A7A"/><circle cx="305" cy="93" r="8" fill="#B87878"/>
+  <text x="305" y="80" text-anchor="middle" font-size="9" fill="#A89898" font-family="sans-serif" font-weight="600">FRIEND</text>
+  <rect x="80" y="36" width="230" height="42" rx="8" fill="#2A3050" stroke="#C99A2E" stroke-width="0.75" opacity="0.95"/>
+  <polygon points="240,78 255,78 248,90" fill="#2A3050"/>
+  <text x="196" y="52" text-anchor="middle" font-size="8" fill="#E8D4D4" font-family="sans-serif" font-style="italic">"Sometimes I think about</text>
+  <text x="196" y="64" text-anchor="middle" font-size="8" fill="#E8D4D4" font-family="sans-serif" font-style="italic">hurting them... please don't</text>
+  <text x="196" y="76" text-anchor="middle" font-size="8" fill="#E8D4D4" font-family="sans-serif" font-style="italic">tell anyone. I trust you."</text>
+</svg>`;
+
+const ILLUS_RESOURCES = `<svg viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+  <rect width="480" height="160" fill="#E8F0F8"/>
+  <rect x="60" y="40" width="120" height="100" fill="#C0CCE0" rx="4"/><rect x="70" y="50" width="100" height="60" fill="#A8B8D0" rx="2"/>
+  <rect x="120" y="98" width="20" height="42" fill="#8898B8"/>
+  <rect x="72" y="50" width="6" height="60" fill="#B0C0D8"/><rect x="85" y="50" width="6" height="60" fill="#B0C0D8"/><rect x="150" y="50" width="6" height="60" fill="#B0C0D8"/><rect x="163" y="50" width="6" height="60" fill="#B0C0D8"/>
+  <rect x="75" y="30" width="110" height="18" rx="3" fill="#1B2B5E"/>
+  <text x="130" y="43" text-anchor="middle" font-size="8" fill="#C99A2E" font-family="sans-serif" font-weight="600">STUDENT AFFAIRS</text>
+  <path d="M260 110 Q300 80 340 90" stroke="#C99A2E" stroke-width="2" stroke-dasharray="6,4" fill="none"/>
+  <polygon points="338,85 346,94 335,96" fill="#C99A2E"/>
+  <circle cx="258" cy="100" r="14" fill="#C9A87A"/><circle cx="258" cy="96" r="6" fill="#A07840"/><ellipse cx="258" cy="116" rx="11" ry="8" fill="#5A7A9A"/>
+  <rect x="290" y="34" width="180" height="18" rx="9" fill="#1B2B5E" opacity="0.88"/><text x="380" y="47" text-anchor="middle" font-size="8.5" fill="#C99A2E" font-family="sans-serif" font-weight="600">Dean of Students</text>
+  <rect x="290" y="61" width="180" height="18" rx="9" fill="#1B2B5E" opacity="0.88"/><text x="380" y="74" text-anchor="middle" font-size="8.5" fill="#C99A2E" font-family="sans-serif" font-weight="600">Counseling Center</text>
+  <rect x="290" y="88" width="180" height="18" rx="9" fill="#1B2B5E" opacity="0.88"/><text x="380" y="101" text-anchor="middle" font-size="8.5" fill="#C99A2E" font-family="sans-serif" font-weight="600">BIT / CARE Team</text>
+</svg>`;
+
+const ILLUSTRATIONS = { s01: ILLUS_S01, s02: ILLUS_S02, s03: ILLUS_S03 };
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+
+function freshState() {
+  return { stage:"welcome", demographics:{}, preSurvey:{}, postSurvey:{}, openEnded:{}, scenarioResults:[], completedIds:[] };
+}
+function loadState() {
+  try { const r = localStorage.getItem("ethosify_v5"); return r ? JSON.parse(r) : freshState(); } catch { return freshState(); }
+}
+function saveState() {
+  try { localStorage.setItem("ethosify_v5", JSON.stringify(STATE)); } catch {}
+}
+
+let STATE = loadState();
+
+// Scenario flow sub-state
+let SF = { scenario:null, step:"intro", dIdx:0, selected:null, responses:[], reasoning:"", confidence:60, ctxTab:"story" };
+
+// ═══════════════════════════════════════════════════════════════════
+// ROUTING
+// ═══════════════════════════════════════════════════════════════════
+
+const ALL_SCREENS = ["welcome","demographics","presurvey","scenarios","scenario-flow","postsurvey","openended","results"];
+
+function showScreen(name) {
+  ALL_SCREENS.forEach(s => {
+    const el = document.getElementById("screen-"+s);
+    if(el) el.classList.toggle("hidden", s !== name);
+  });
+  window.scrollTo(0,0);
+  updateStageBar(name);
+}
+
+function updateStageBar(screen) {
+  const bar = document.getElementById("stage-bar");
+  const stageOrder = ["demographics","presurvey","scenarios","postsurvey","results"];
+  const screenToStage = { demographics:"demographics", presurvey:"presurvey", scenarios:"scenarios", "scenario-flow":"scenarios", postsurvey:"postsurvey", openended:"postsurvey", results:"results" };
+  if(screen === "welcome") { bar.style.display="none"; return; }
+  bar.style.display = "flex";
+  const cur = screenToStage[screen] || screen;
+  const curIdx = stageOrder.indexOf(cur);
+  stageOrder.forEach((s,i) => {
+    const el = document.getElementById("stage-"+s);
+    if(!el) return;
+    el.classList.remove("done","active");
+    if(i < curIdx) el.classList.add("done");
+    else if(i === curIdx) el.classList.add("active");
+  });
+}
+
+function goWelcome() { renderWelcome(); showScreen("welcome"); }
+
+// ═══════════════════════════════════════════════════════════════════
+// WELCOME
+// ═══════════════════════════════════════════════════════════════════
+
+function renderWelcome() {
+  document.getElementById("screen-welcome").innerHTML = `
+  <div class="page fi">
+    <div class="eyebrow">Ethosify · Higher Education</div>
+    <h1 class="display">Decision training for<br>student leaders.</h1>
+    <p class="lead" style="max-width:540px;margin-bottom:1.75rem">Ethosify builds the threat recognition and behavioral awareness skills that campus leaders need — through realistic scenarios, structured reflection, and before-and-after measurement of your confidence.</p>
+    <div class="feature-list">
+      <div class="eyebrow" style="margin-bottom:.75rem">What to expect</div>
+      ${[["~2 min","Brief demographics and pre-training survey"],["~25 min","3 realistic decision scenarios with reflection"],["~3 min","Post-training survey and open-ended reflection"],["Instant","Pre/post comparison and your decision profile"]].map(([t,d])=>`
+      <div class="feature-row"><div class="feature-time">${t}</div><div class="feature-desc">${d}</div></div>`).join("")}
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="startProgram()">Begin →</button>
+    </div>
+    <div class="howcard">
+      <div class="eyebrow">How it works</div>
+      ${[["Read","Immerse in a realistic scenario involving a campus leader and an ambiguous situation."],["Decide","Choose from four options — no feedback until after you commit."],["Reflect","Explain your reasoning and rate your confidence from 0 to 100."],["Grow","See cumulative patterns in your decision-making with adaptive feedback."]].map(([t,d],i)=>`
+      <div class="howstep"><div class="hnum">${i+1}</div><div class="htxt"><strong style="color:var(--navy)">${t}. </strong>${d}</div></div>`).join("")}
+    </div>
+  </div>`;
+}
+
+function startProgram() {
+  STATE.stage = "demographics";
+  saveState();
+  renderDemographics();
+  showScreen("demographics");
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DEMOGRAPHICS
+// ═══════════════════════════════════════════════════════════════════
+
+function renderDemographics() {
+  const d = STATE.demographics;
+  function radio(key, val) { return `<div class="demo-option ${d[key]===val?"sel":""}" onclick="setDemo('${key}','${val}');renderDemographics()"><div class="demo-radio">${d[key]===val?'<div class="demo-radio-dot"></div>':''}</div>${val}</div>`; }
+  function check(key, val) { const arr=d[key]||[]; const s=arr.includes(val); return `<div class="check-opt ${s?"sel":""}" onclick="toggleDemo('${key}','${val}');renderDemographics()"><div class="check-box">${s?"✓":""}</div><span>${val}</span></div>`; }
+  const canContinue = d.year && (d.roles||[]).length>0 && d.priorTraining && d.familiarityLevel;
+  document.getElementById("screen-demographics").innerHTML = `
+  <div class="survey-wrap fi">
+    <div class="eyebrow">Step 1 of 4</div>
+    <h1 class="display-sm" style="margin-bottom:.5rem">A little about you</h1>
+    <p class="lead" style="margin-bottom:1.5rem;font-size:14px">These questions are confidential and used only for research purposes. No personally identifying information is collected.</p>
+    <div class="instr-box">Your responses help researchers understand how different student leaders experience this training. All data is anonymous.</div>
+    <div class="demo-card">
+      <div class="demo-label">D1. What is your current year in college?</div>
+      <div class="demo-options">${["First year","Sophomore","Junior","Senior","Graduate student"].map(v=>radio("year",v)).join("")}</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">D2. Which best describes your campus leadership role? <span style="font-weight:400;color:#9AA3B0">(Select all that apply)</span></div>
+      <div class="check-grid">${["Student org president/VP","Resident advisor (RA)","Student government officer","Peer mentor or ambassador","Athletic team captain","Greek life officer"].map(v=>check("roles",v)).join("")}</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">D3. Have you received formal training on recognizing behavioral warning signs or campus safety reporting?</div>
+      <div class="demo-options">${["Yes — formal training received","No","Unsure"].map(v=>radio("priorTraining",v)).join("")}</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">D4. Have you ever personally observed a situation involving a peer that caused concern about safety?</div>
+      <div class="demo-row">${["Yes","No","Prefer not to answer"].map(v=>radio("priorExperience",v)).join("")}</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">D5. How familiar are you with your campus's behavioral intervention or threat assessment resources — right now, before this training?</div>
+      <div class="demo-options">${["Not at all familiar","Slightly familiar","Moderately familiar","Very familiar"].map(v=>radio("familiarityLevel",v)).join("")}</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="gotoPreSurvey()" ${canContinue?"":"disabled"}>Continue to Pre-Survey →</button>
+    </div>
+    ${!canContinue?'<p style="font-size:12px;color:#9AA3B0;margin-top:.75rem">Please answer all required questions to continue.</p>':""}
+  </div>`;
+}
+
+function setDemo(key, val) { STATE.demographics[key] = val; saveState(); }
+function toggleDemo(key, val) {
+  const arr = STATE.demographics[key] || [];
+  STATE.demographics[key] = arr.includes(val) ? arr.filter(v=>v!==val) : [...arr, val];
+  saveState();
+}
+function gotoPreSurvey() { STATE.stage="presurvey"; saveState(); renderLikert("pre"); showScreen("presurvey"); }
+
+// ═══════════════════════════════════════════════════════════════════
+// LIKERT SURVEY
+// ═══════════════════════════════════════════════════════════════════
+
+function renderLikert(phase) {
+  const isPost = phase==="post";
+  const items = isPost ? POST_ITEMS : PRE_ITEMS;
+  const data = isPost ? STATE.postSurvey : STATE.preSurvey;
+  const screenId = isPost ? "screen-postsurvey" : "screen-presurvey";
+  const answered = items.filter(i=>data[i.id]!=null).length;
+  const pct = Math.round((answered/items.length)*100);
+  const canCont = answered === items.length;
+  const selCls = isPost ? "sel-post" : "sel-pre";
+
+  const itemsHtml = items.map(item => {
+    const c = CONSTRUCTS.find(x=>x.id===item.construct);
+    return `<div class="q-card ${data[item.id]!=null?"answered":""}" id="qcard-${phase}-${item.id}">
+      <div class="q-header">
+        <div class="q-num">${item.id}</div>
+        <div>
+          <div class="q-construct" style="color:${c?.dot}">${c?.label}</div>
+          <div class="q-text">${item.text}</div>
+        </div>
+      </div>
+      <div class="likert-wrap">
+        <div class="likert-hdr"><span>Strongly Disagree</span><span>Strongly Agree</span></div>
+        <div class="likert-scale">
+          ${[1,2,3,4,5].map(v=>`
+          <div class="l-opt" onclick="setLikert('${phase}','${item.id}',${v})">
+            <div class="l-circle ${data[item.id]===v?selCls:""}" id="lc-${phase}-${item.id}-${v}">${v}</div>
+            <div class="l-val">${LIKERT_LABELS[v-1].split(' ')[0].slice(0,6)}</div>
+          </div>`).join("")}
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+
+  document.getElementById(screenId).innerHTML = `
+  <div class="survey-wrap fi">
+    <div class="eyebrow">${isPost?"Step 3 of 4":"Step 2 of 4"}</div>
+    <h1 class="display-sm" style="margin-bottom:.5rem">${isPost?"Post-Training Survey":"Pre-Training Survey"}</h1>
+    <p class="lead" style="margin-bottom:1.25rem;font-size:14px">${isPost?"Respond based on how you feel now — after completing all three scenarios.":"Respond based on how you honestly feel right now, before completing any training."}</p>
+    <div class="instr-box ${isPost?"green":""}">For each statement, select the number that best reflects your level of agreement. There are no right or wrong answers.</div>
+    <div class="survey-progress" style="margin-bottom:1.5rem">
+      <div class="sp-label">${answered} of ${items.length} answered</div>
+      <div class="sp-track"><div class="sp-fill" id="sp-fill-${phase}" style="width:${pct}%"></div></div>
+    </div>
+    ${itemsHtml}
+    <div class="btn-row">
+      <button class="btn btn-p" id="btn-likert-${phase}" onclick="${isPost?"gotoOpenEnded()":"gotoScenarios()"}" ${canCont?"":"disabled"}>
+        ${isPost?"Continue to Reflection →":"Begin Training →"}
+      </button>
+      <button class="btn btn-o" onclick="${isPost?"gotoScenariosFromPost()":"renderDemographics();showScreen('demographics')"}">← Back</button>
+    </div>
+    ${!canCont?`<p style="font-size:12px;color:#9AA3B0;margin-top:.75rem">Please answer all ${items.length} items to continue.</p>`:""}
+  </div>`;
+}
+
+function setLikert(phase, itemId, val) {
+  if(phase==="pre") STATE.preSurvey[itemId]=val;
+  else STATE.postSurvey[itemId]=val;
+  saveState();
+  // Update circles without full re-render
+  for(let v=1;v<=5;v++){
+    const el=document.getElementById(`lc-${phase}-${itemId}-${v}`);
+    if(el){ el.className="l-circle"+(v===val?(phase==="post"?" sel-post":" sel-pre"):""); }
+  }
+  const qcard=document.getElementById(`qcard-${phase}-${itemId}`);
+  if(qcard) qcard.classList.add("answered");
+  // Update progress
+  const items = phase==="post" ? POST_ITEMS : PRE_ITEMS;
+  const data  = phase==="post" ? STATE.postSurvey : STATE.preSurvey;
+  const answered = items.filter(i=>data[i.id]!=null).length;
+  const pct = Math.round((answered/items.length)*100);
+  const fill = document.getElementById(`sp-fill-${phase}`);
+  if(fill) fill.style.width = pct+"%";
+  const label = fill?.closest(".survey-progress")?.querySelector(".sp-label");
+  if(label) label.textContent = `${answered} of ${items.length} answered`;
+  const btn = document.getElementById(`btn-likert-${phase}`);
+  if(btn) btn.disabled = answered < items.length;
+}
+
+function gotoScenarios() { STATE.stage="scenarios"; saveState(); renderScenarioDashboard(); showScreen("scenarios"); }
+function gotoScenariosFromPost() { renderScenarioDashboard(); showScreen("scenarios"); }
+
+// ═══════════════════════════════════════════════════════════════════
+// SCENARIO DASHBOARD
+// ═══════════════════════════════════════════════════════════════════
+
+function renderScenarioDashboard() {
+  const cids = STATE.completedIds;
+  const allDone = cids.length === SCENARIOS.length;
+  const pct = Math.round((cids.length/SCENARIOS.length)*100);
+  const cards = SCENARIOS.map((s,i) => {
+    const done = cids.includes(s.id);
+    const locked = i>0 && !cids.includes(SCENARIOS[i-1].id) && !done;
+    const badge = done?"<span class='sbadge badge-done'>✓ Completed</span>":locked?"<span class='sbadge badge-locked'>🔒 Locked</span>":`<span class='sbadge badge-avail'>Scenario ${i+1}</span>`;
+    return `<div class="scard ${done?"done":""} ${locked?"locked":""}" onclick="${!locked?`startScenario('${s.id}')`:""}" >
+      ${ILLUSTRATIONS[s.id]}
+      <div class="scard-body">
+        ${badge}
+        <div class="scard-title">${s.title}</div>
+        <div class="scard-hook">${s.shortHook}</div>
+        <div class="scard-meta"><span>◎ ${s.ambiguityLevel} ambiguity</span><span>◷ ~${s.estimatedMinutes} min</span></div>
+      </div>
+      <div class="scard-bar"></div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("screen-scenarios").innerHTML = `
+  <div class="page fi">
+    <div class="eyebrow">Training · Scenarios</div>
+    <h1 class="display-sm" style="margin-bottom:.5rem">Work through each scenario</h1>
+    <p class="lead" style="margin-bottom:1rem;font-size:14px">Complete all three scenarios before moving to the post-survey. Each builds on skills from the previous one.</p>
+    <div class="sp-label">${cids.length} of ${SCENARIOS.length} scenarios completed</div>
+    <div class="sp-track"><div class="sp-fill" style="width:${pct}%"></div></div>
+    <div class="sgrid">${cards}</div>
+    ${allDone?`<div class="complete-box">
+      <div class="complete-box-title">✓ All scenarios complete!</div>
+      <div class="complete-box-body">You've finished all three training scenarios. Now complete the post-survey to see how your confidence has changed.</div>
+      <button class="btn btn-p" onclick="gotoPostSurvey()">Continue to Post-Survey →</button>
+    </div>`:""}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SCENARIO FLOW
+// ═══════════════════════════════════════════════════════════════════
+
+function startScenario(id) {
+  SF = { scenario: SCENARIOS.find(s=>s.id===id), step:"intro", dIdx:0, selected:null, responses:[], reasoning:"", confidence:60, ctxTab:"story" };
+  renderScenarioFlow();
+  showScreen("scenario-flow");
+}
+
+function renderScenarioFlow() {
+  const s = SF.scenario;
+  const step = SF.step;
+  const screen = document.getElementById("screen-scenario-flow");
+
+  if(step==="intro") {
+    screen.innerHTML = `<div class="flow fi">
+      <div class="crumb"><span class="crumb-link" onclick="backToScenarios()">← Scenarios</span><span class="crumb-sep">›</span><span>${s.title}</span></div>
+      <div class="card-flush">
+        ${ILLUSTRATIONS[s.id]}
+        <div class="card-inner">
+          <div class="tag">Scenario Introduction</div>
+          <div class="display-sm">${s.title}</div>
+          <p style="font-size:15px;color:var(--slate);line-height:1.7;margin-bottom:1.25rem">${s.shortHook}</p>
+          <div class="imeta">
+            <div class="mi"><strong>Focus:</strong> ${s.introFocus}</div>
+            <div class="mi"><strong>Ambiguity:</strong> ${s.ambiguityLevel}</div>
+            <div class="mi"><strong>~${s.estimatedMinutes} min</strong></div>
+          </div>
+          <div class="divider"></div>
+          <p style="font-size:14px;color:var(--slate);line-height:1.6;font-style:italic">Read carefully. Some responses are more responsible than others — but the situations are genuinely ambiguous.</p>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-p" onclick="sfStep('context')">Start →</button>
+        <button class="btn btn-o" onclick="backToScenarios()">← Back</button>
+      </div>
+    </div>`;
+  }
+  else if(step==="context") {
+    const ct = SF.ctxTab;
+    let tabContent = "";
+    if(ct==="story") {
+      tabContent = `<div class="card pop">
+        <div class="tag">Scenario Context</div>
+        <div class="body-t">${s.context.map(p=>`<p>${p}</p>`).join("")}</div>
+        ${s.quotes?`<div style="margin-top:1rem">${s.quotes.map(q=>`<div class="qblock">${q}</div>`).join("")}</div>`:""}
+        <p style="font-size:14px;color:#9AA3B0;text-align:center;font-style:italic;margin-top:1.25rem">As you read, notice what stands out.</p>
+      </div>`;
+    } else if(ct==="timeline") {
+      const tl = s.timeline.map((ev,i)=>`
+        <div class="timeline-item">
+          <div class="timeline-num" style="background:${ev.c}">${i+1}</div>
+          <div class="timeline-content">
+            <div class="timeline-week" style="color:${ev.c}">${ev.w}</div>
+            <div class="timeline-label">${ev.l}</div>
+          </div>
+        </div>`).join("");
+      tabContent = `<div class="card pop">
+        <div class="tag">Behavior Over Time</div>
+        <p style="font-size:14px;color:var(--slate);margin-bottom:1rem;line-height:1.6">A key skill is recognizing patterns across time, not just reacting to single events.</p>
+        <div class="timeline-wrap"><div class="timeline-line"></div>${tl}</div>
+      </div>`;
+    } else {
+      const note = s.id==="s01"?"Notice Alex's position at the edge of the room — physical withdrawal is often an early visible signal. No single behavior is conclusive; the pattern across contexts is what matters.":
+        s.id==="s02"?"When a comment lands differently on different people, that variation matters. The peer who messages you later is telling you something worth attending to.":
+        "The late-night setting creates deep relational intimacy. The trust is real — and the concern is also real. Effective judgment means holding both at once.";
+      tabContent = `<div class="card-flush pop">
+        ${ILLUSTRATIONS[s.id]}
+        <div class="card-inner">
+          <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:.25rem">Scene context</div>
+          <p style="font-size:13px;color:var(--slate);line-height:1.6">${note}</p>
+        </div>
+      </div>`;
+    }
+    screen.innerHTML = `<div class="flow fi">
+      <div class="crumb"><span class="crumb-link" onclick="backToScenarios()">← Scenarios</span><span class="crumb-sep">›</span><span>${s.title}</span></div>
+      <div class="tab-bar">
+        <button class="tab ${ct==="story"?"on":""}" onclick="sfTab('story')">The Situation</button>
+        <button class="tab ${ct==="timeline"?"on":""}" onclick="sfTab('timeline')">Timeline</button>
+        <button class="tab ${ct==="visual"?"on":""}" onclick="sfTab('visual')">Scene</button>
+      </div>
+      ${tabContent}
+      <button class="btn btn-p" style="margin-top:1rem" onclick="sfStep('decision')">Continue to Decision →</button>
+    </div>`;
+  }
+  else if(step==="decision") {
+    const dec = s.decisions[SF.dIdx];
+    const dots = s.decisions.map((_,i)=>`<div class="dot ${i<SF.dIdx?"done-d":i===SF.dIdx?"on":""}"></div>`).join("");
+    const opts = dec.options.map(opt=>`
+      <div class="choice ${SF.selected?.id===opt.id?"chosen":""} ${SF.selected&&SF.selected.id!==opt.id?"dim":""}" onclick="sfChoose('${opt.id}')">
+        <div class="ckey">${opt.id}</div>
+        <div><div class="clabel">${opt.label}</div></div>
+      </div>`).join("");
+    screen.innerHTML = `<div class="flow fi">
+      <div class="crumb"><span class="crumb-link" onclick="backToScenarios()">← Scenarios</span><span class="crumb-sep">›</span><span>${s.title}</span></div>
+      <div style="margin-bottom:1.25rem"><div class="dots">${dots}</div></div>
+      <div class="card">
+        <div class="tag">Decision ${SF.dIdx+1} of ${s.decisions.length}</div>
+        <div class="dprompt">${dec.prompt}</div>
+        <p style="font-size:13px;color:#9AA3B0;margin-bottom:1.25rem">Your answer is not revealed until you select.</p>
+        <div class="cgrid">${opts}</div>
+      </div>
+    </div>`;
+  }
+  else if(step==="feedback") {
+    const sel = SF.selected;
+    const fClass = sel.cls==="optimal"?"f-ok":sel.cls==="partial"?"f-mid":"f-bad";
+    const resourceBox = sel.cls==="optimal"?`<div class="card-flush pop" style="margin-bottom:1.25rem">
+      ${ILLUS_RESOURCES}
+      <div class="card-inner">
+        <div style="font-size:13px;font-weight:700;color:var(--ok-txt);margin-bottom:.25rem">Why campus resources matter</div>
+        <p style="font-size:13px;color:var(--slate);line-height:1.6">Student leaders notice and report — they don't investigate. Connecting concerns early to the right systems keeps everyone safer and keeps your role appropriate.</p>
+      </div>
+    </div>`:"";
+    screen.innerHTML = `<div class="flow fi">
+      <div class="crumb"><span class="crumb-link" onclick="backToScenarios()">← Scenarios</span><span class="crumb-sep">›</span><span>${s.title}</span></div>
+      <div class="fcard ${fClass}">
+        <div class="ftitle">${sel.fbTitle}</div>
+        <div class="fbody">${sel.fbBody}</div>
+        <div class="consq"><span style="font-size:16px;color:#9AA3B0;line-height:1.5">→</span><span class="consq-txt">${sel.consequence}</span></div>
+      </div>
+      ${resourceBox}
+      <div class="btn-row"><button class="btn btn-p" onclick="sfStep('reflection')">Reflect →</button></div>
+    </div>`;
+  }
+  else if(step==="reflection") {
+    const dec = s.decisions[SF.dIdx];
+    screen.innerHTML = `<div class="flow fi">
+      <div class="crumb"><span class="crumb-link" onclick="backToScenarios()">← Scenarios</span><span class="crumb-sep">›</span><span>${s.title}</span></div>
+      <div class="card">
+        <div class="tag">Reflection</div>
+        <div style="margin-bottom:1.5rem">
+          <div class="rl">${dec.reflectionPrompt}</div>
+          <textarea class="rta" id="sf-reasoning" placeholder="Share your thinking in 2–6 sentences..." rows="4">${SF.reasoning}</textarea>
+        </div>
+        <div>
+          <div class="rl" style="margin-bottom:.75rem">${dec.confidencePrompt}</div>
+          <div class="conf-grid">
+            <div>
+              <div class="cval" id="conf-display">${SF.confidence}</div>
+              <input type="range" min="0" max="100" step="1" value="${SF.confidence}" class="conf-slider" id="conf-slider" oninput="updateConf(this.value)">
+              <div class="cends"><span>Not at all (0)</span><span>Fully confident (100)</span></div>
+            </div>
+            <svg id="conf-gauge" viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">${confGaugeSVG(SF.confidence)}</svg>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-p" onclick="sfReflectContinue()">Continue →</button>
+    </div>`;
+  }
+  else if(step==="debrief") {
+    const pathNodes = s.decisions.map((d,i) => {
+      const x=30+i*140, resp=SF.responses.find(r=>r.decisionId===d.id);
+      const bg=!resp?"#F0EDE8":resp.cls==="optimal"?"#EAF3DE":resp.cls==="partial"?"#FAEEDA":"#FCEBEB";
+      const stroke=!resp?"#C8C4C0":resp.cls==="optimal"?"#3B6D11":resp.cls==="partial"?"#854F0B":"#A32D2D";
+      const txt=!resp?"#9AA3B0":resp.cls==="optimal"?"#27500A":resp.cls==="partial"?"#633806":"#791F1F";
+      const line=i>0?`<line x1="${30+(i-1)*140+80}" y1="46" x2="${x}" y2="46" stroke="${SF.responses.length>i-1?"#C99A2E":"#DDD"}" stroke-width="1.5" stroke-dasharray="${SF.responses.length>i?"none":"4,3"}"/>`:"";
+      return `${line}<rect x="${x}" y="30" width="80" height="32" rx="8" fill="${bg}" stroke="${stroke}" stroke-width="1"/><text x="${x+40}" y="43" text-anchor="middle" font-size="8" fill="${txt}" font-family="sans-serif" font-weight="600">Decision ${i+1}</text><text x="${x+40}" y="54" text-anchor="middle" font-size="7" fill="${txt}" font-family="sans-serif">${!resp?"pending":resp.cls==="optimal"?"strong":resp.cls==="partial"?"partial":"consider"}</text>`;
+    }).join("");
+    const debriefEnd=SF.responses.length===s.decisions.length?`<line x1="${30+(s.decisions.length-1)*140+80}" y1="46" x2="${30+(s.decisions.length-1)*140+115}" y2="46" stroke="#C99A2E" stroke-width="1.5"/><rect x="${30+(s.decisions.length-1)*140+115}" y="30" width="55" height="32" rx="8" fill="#1B2B5E"/><text x="${30+(s.decisions.length-1)*140+143}" y="50" text-anchor="middle" font-size="8" fill="#C99A2E" font-family="sans-serif" font-weight="600">Debrief</text>`:"";
+    const decCards = SF.responses.map((r,i)=>{
+      const opt=s.decisions[i]?.options.find(o=>o.id===r.selectedOptionId);
+      const bg=r.cls==="optimal"?"#EAF3DE":r.cls==="partial"?"#FAEEDA":"#FCEBEB";
+      const tc=r.cls==="optimal"?"#27500A":r.cls==="partial"?"#633806":"#791F1F";
+      return `<div style="flex:1 1 180px;background:${bg};border-radius:10px;padding:.75rem"><div style="font-size:10px;font-weight:700;color:${tc};text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Decision ${i+1}</div><div style="font-size:12px;color:var(--navy);font-weight:600;margin-bottom:.2rem">${opt?.label||""}</div><div style="font-size:11px;color:#6B7280">Confidence: ${r.confidence}/100</div></div>`;
+    }).join("");
+    screen.innerHTML = `<div class="flow fi">
+      <div class="crumb"><span class="crumb-link" onclick="backToScenarios()">← Scenarios</span><span class="crumb-sep">›</span><span>${s.title}</span></div>
+      <div class="card">
+        <div class="tag">Scenario Debrief</div>
+        <div class="display-sm">${s.debriefTitle}</div>
+        <p style="font-size:15px;line-height:1.8;color:#374151;margin-bottom:1.5rem">${s.debriefSummary}</p>
+        <div style="margin-bottom:1.5rem">
+          <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:.75rem">Your decision path</div>
+          <svg viewBox="0 0 420 80" xmlns="http://www.w3.org/2000/svg" class="decision-path">${pathNodes}${debriefEnd}</svg>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.75rem">${decCards}</div>
+        </div>
+        <div class="di-ok"><div class="il il-g">Key Insight</div><div class="it">${s.keyInsight}</div></div>
+        <div style="height:10px"></div>
+        <div class="di-ca"><div class="il il-n">Caution Point</div><div class="it">${s.cautionPoint}</div></div>
+      </div>
+      <button class="btn btn-p" onclick="backToScenarios()">← Back to Scenarios</button>
+    </div>`;
+  }
+}
+
+function sfStep(step) { SF.step=step; renderScenarioFlow(); window.scrollTo(0,0); }
+function sfTab(tab) { SF.ctxTab=tab; renderScenarioFlow(); }
+function sfChoose(optId) {
+  if(SF.selected) return;
+  const dec = SF.scenario.decisions[SF.dIdx];
+  SF.selected = dec.options.find(o=>o.id===optId);
+  sfStep("feedback");
+}
+function updateConf(val) {
+  SF.confidence = parseInt(val);
+  const disp = document.getElementById("conf-display");
+  if(disp) disp.textContent = val;
+  const gauge = document.getElementById("conf-gauge");
+  if(gauge) gauge.innerHTML = confGaugeSVG(SF.confidence);
+}
+function sfReflectContinue() {
+  const ta = document.getElementById("sf-reasoning");
+  SF.reasoning = ta ? ta.value : "";
+  const s = SF.scenario;
+  const dec = s.decisions[SF.dIdx];
+  const resp = { scenarioId:s.id, decisionId:dec.id, selectedOptionId:SF.selected.id, cls:SF.selected.cls, classification:SF.selected.cls, patternTags:SF.selected.tags, reasoningText:SF.reasoning, confidence:SF.confidence, timestamp:new Date().toISOString() };
+  SF.responses.push(resp);
+  SF.reasoning=""; SF.confidence=60; SF.selected=null;
+  if(SF.dIdx+1 < s.decisions.length) { SF.dIdx++; sfStep("decision"); }
+  else { sfStep("debrief"); completeScenario(); }
+}
+function completeScenario() {
+  const s = SF.scenario;
+  const result = {
+    scenarioId:s.id, responses:SF.responses,
+    scenarioAccuracyScore: SF.responses.filter(r=>r.cls==="optimal").length/SF.responses.length,
+    averageConfidence: Math.round(SF.responses.reduce((sum,r)=>sum+r.confidence,0)/SF.responses.length),
+    detectedPatterns: [...new Set(SF.responses.flatMap(r=>r.patternTags))],
+  };
+  STATE.scenarioResults = [...STATE.scenarioResults.filter(r=>r.scenarioId!==s.id), result];
+  if(!STATE.completedIds.includes(s.id)) STATE.completedIds.push(s.id);
+  STATE.stage = "scenarios"; saveState();
+}
+function backToScenarios() { renderScenarioDashboard(); showScreen("scenarios"); }
+
+function confGaugeSVG(val) {
+  const a=-135+(val/100)*270, rad=(a*Math.PI)/180, r=50, cx=80, cy=72;
+  const nx=cx+r*Math.cos(rad), ny=cy+r*Math.sin(rad);
+  const col=val>70?"#C99A2E":val>40?"#5DCAA5":"#8898B8";
+  const flag=val>50?1:0;
+  return `<path d="M 30 72 A 50 50 0 1 1 130 72" fill="none" stroke="#E8E4E0" stroke-width="8" stroke-linecap="round"/>
+    <path d="M 30 72 A 50 50 0 ${flag} 1 ${nx.toFixed(1)} ${ny.toFixed(1)}" fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="5" fill="#1B2B5E"/>
+    <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#1B2B5E" stroke-width="2" stroke-linecap="round"/>
+    <text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="18" font-weight="700" fill="#1B2B5E" font-family="sans-serif">${val}</text>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// POST SURVEY & OPEN ENDED
+// ═══════════════════════════════════════════════════════════════════
+
+function gotoPostSurvey() { STATE.stage="postsurvey"; saveState(); renderLikert("post"); showScreen("postsurvey"); }
+function gotoOpenEnded() { STATE.stage="openended"; saveState(); renderOpenEnded(); showScreen("openended"); }
+function renderOpenEnded() {
+  const data = STATE.openEnded;
+  const answered = OE_ITEMS.filter(i=>(data[i.id]||"").trim().length>10).length;
+  const items = OE_ITEMS.map(item=>`
+    <div class="oe-card">
+      <div class="oe-construct">${item.id} · ${item.construct}</div>
+      <div class="oe-text">${item.text}</div>
+      <textarea class="oe-ta" rows="3" placeholder="Your response..." oninput="setOE('${item.id}',this.value)">${data[item.id]||""}</textarea>
+    </div>`).join("");
+  document.getElementById("screen-openended").innerHTML = `
+  <div class="survey-wrap fi">
+    <div class="eyebrow">Step 3 of 4 — Continued</div>
+    <h1 class="display-sm" style="margin-bottom:.5rem">Open-Ended Reflection</h1>
+    <p class="lead" style="margin-bottom:1.25rem;font-size:14px">Take a few minutes to reflect in your own words. These responses help researchers understand the nature of your learning.</p>
+    <div class="instr-box green">There are no right or wrong answers. Aim for 2–5 sentences per response.</div>
+    <div style="height:1rem"></div>
+    ${items}
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="gotoResults()">View My Results →</button>
+    </div>
+    <p style="font-size:12px;color:#9AA3B0;margin-top:.75rem">${answered} of ${OE_ITEMS.length} responses provided. Open-ended items are optional but encouraged.</p>
+  </div>`;
+}
+function setOE(id, val) { STATE.openEnded[id]=val; saveState(); }
+
+// ═══════════════════════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════════════════════
+
+function computeSubscores(responses, items) {
+  const result={};
+  CONSTRUCTS.forEach(c=>{
+    const cItems=items.filter(i=>i.construct===c.id);
+    const vals=cItems.map(i=>responses[i.id]).filter(v=>v!=null);
+    result[c.id]=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+  });
+  const all=Object.values(result).filter(v=>v!=null);
+  result.total=all.length?all.reduce((a,b)=>a+b,0)/all.length:null;
+  return result;
+}
+
+function detectPatterns(results) {
+  const tags=[]; let total=0,optimal=0,confSum=0,confN=0;
+  results.forEach(sr=>sr.responses.forEach(r=>{total++;if(r.cls==="optimal"||r.classification==="optimal")optimal++;if(r.confidence!=null){confSum+=r.confidence;confN++;}(r.patternTags||[]).forEach(t=>tags.push(t));}));
+  const tc={}; tags.forEach(t=>{tc[t]=(tc[t]||0)+1;});
+  const p=[];
+  if((tc.underreaction||0)+(tc.delay||0)>=2)p.push("underreaction");
+  if((tc.overreaction||0)+(tc.threat_inflation||0)>=2)p.push("overreaction");
+  if((tc.self_handling||0)>=2)p.push("self_handling");
+  if((tc.avoidance||0)+(tc.withdrawal||0)>=2)p.push("avoidance");
+  const acc=total>0?optimal/total:0, avgConf=confN>0?confSum/confN:50;
+  if(avgConf>65&&acc<0.4)p.push("confidence_mismatch");
+  else if(avgConf<45&&acc>0.6)p.push("developing_confidence");
+  if(p.length===0)p.push("balanced");
+  return{patterns:p,accuracy:acc,avgConf:Math.round(avgConf),total,optimal};
+}
+
+function gotoResults() { STATE.stage="results"; saveState(); renderResults("survey"); showScreen("results"); }
+
+function renderResults(activeTab) {
+  const {patterns,accuracy,avgConf,total,optimal}=detectPatterns(STATE.scenarioResults);
+  const accPct=Math.round(accuracy*100);
+  const preS=computeSubscores(STATE.preSurvey, PRE_ITEMS);
+  const postS=computeSubscores(STATE.postSurvey, POST_ITEMS);
+  const totalDiff=(postS.total??0)-(preS.total??0);
+
+  const tabs=`<div class="tab-bar">
+    <button class="tab ${activeTab==="survey"?"on":""}" onclick="renderResults('survey')">Pre/Post Survey</button>
+    <button class="tab ${activeTab==="decisions"?"on":""}" onclick="renderResults('decisions')">Decision Profile</button>
+    <button class="tab ${activeTab==="openended"?"on":""}" onclick="renderResults('openended')">Reflections</button>
+  </div>`;
+
+  let content="";
+
+  if(activeTab==="survey") {
+    const bars=CONSTRUCTS.map(c=>{
+      const pre=preS[c.id]??0, post=postS[c.id]??0, diff=post-pre;
+      const dl=diff>0.05?`+${diff.toFixed(1)}`:diff<-0.05?diff.toFixed(1):"—";
+      const pc=diff>0.05?"delta-pos":diff<-0.05?"delta-neg":"delta-neu";
+      return `<div class="compare-bar-wrap">
+        <div class="compare-lbl"><span>${c.label}</span><span class="delta-pill ${pc}">${dl}</span></div>
+        <div class="cbar-row"><div class="cbar-tag">Pre</div><div class="cbar-track"><div class="cbar-fill pre" style="width:${(pre/5)*100}%"></div></div><div class="cbar-val">${pre.toFixed(1)}</div></div>
+        <div class="cbar-row"><div class="cbar-tag">Post</div><div class="cbar-track"><div class="cbar-fill post" style="width:${(post/5)*100}%"></div></div><div class="cbar-val">${post.toFixed(1)}</div></div>
+      </div>`;
+    }).join("");
+
+    // Radar
+    const R=70,cx=130,cy=90;
+    function pt(angle,r){const rad=(angle*Math.PI)/180;return[cx+r*Math.cos(rad),cy+r*Math.sin(rad)];}
+    const axes=CONSTRUCTS.map((c,i)=>({...c,angle:-90+i*72}));
+    const preScored=axes.map(a=>{const v=preS[a.id];return v!=null?v/5:0.15;});
+    const postScored=axes.map(a=>{const v=postS[a.id];return v!=null?v/5:0.15;});
+    const prePoly=axes.map((a,i)=>pt(a.angle,R*preScored[i]).map(x=>x.toFixed(1)).join(",")).join(" ");
+    const postPoly=axes.map((a,i)=>pt(a.angle,R*postScored[i]).map(x=>x.toFixed(1)).join(",")).join(" ");
+    const gridLines=[0.25,0.5,0.75,1.0].map(l=>`<polygon points="${axes.map(a=>pt(a.angle,R*l).map(x=>x.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="#E0DDD7" stroke-width="0.75"/>`).join("");
+    const axesLines=axes.map(a=>{const[x,y]=pt(a.angle,R);return`<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#D0CCC8" stroke-width="0.75"/>`;}).join("");
+    const axisDots=axes.map((a,i)=>{const[x,y]=pt(a.angle,R*postScored[i]);return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="#1B2B5E"/>`;}).join("");
+    const axisLabels=axes.map(a=>{const[x,y]=pt(a.angle,R+14);const anchor=x<cx-5?"end":x>cx+5?"start":"middle";return`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}" font-size="7" fill="#5A6078" font-family="sans-serif" font-weight="500">${a.label}</text>`;}).join("");
+    const radarSVG=`<svg viewBox="0 0 260 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">${gridLines}${axesLines}<polygon points="${prePoly}" fill="#9AA3B0" fill-opacity="0.2" stroke="#9AA3B0" stroke-width="1.5"/><polygon points="${postPoly}" fill="#1B2B5E" fill-opacity="0.2" stroke="#1B2B5E" stroke-width="1.5"/>${axisDots}${axisLabels}<circle cx="${cx}" cy="${cy}" r="3" fill="#1B2B5E"/></svg>`;
+
+    const diffLabel=totalDiff>0?`+${totalDiff.toFixed(2)}`:totalDiff.toFixed(2);
+    const diffColor=totalDiff>0?"#27500A":totalDiff<0?"#791F1F":"#1B2B5E";
+    content=`
+      <div class="rgrid">
+        <div class="sstat"><div class="snum">${(preS.total??0).toFixed(1)}</div><div class="slbl">Pre-Survey Mean</div></div>
+        <div class="sstat"><div class="snum">${(postS.total??0).toFixed(1)}</div><div class="slbl">Post-Survey Mean</div></div>
+        <div class="sstat"><div class="snum" style="color:${diffColor}">${diffLabel}</div><div class="slbl">Mean Change</div></div>
+        <div class="sstat"><div class="snum">${accPct}%</div><div class="slbl">Optimal Decisions</div></div>
+      </div>
+      <div class="card">
+        <div class="tag" style="margin-bottom:1rem">Confidence by Construct</div>
+        <div class="legend-row">
+          <div class="legend-item"><div class="legend-dot" style="background:#9AA3B0"></div><span>Pre-training</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--navy)"></div><span>Post-training</span></div>
+        </div>
+        ${bars}
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:14px;font-weight:600;color:var(--navy)">Total Preparedness Score</div>
+          <div class="delta-pill ${totalDiff>0.05?"delta-pos":totalDiff<-0.05?"delta-neg":"delta-neu"}" style="font-size:13px;padding:4px 12px">${(preS.total??0).toFixed(1)} → ${(postS.total??0).toFixed(1)} &nbsp;(${diffLabel})</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag">Radar — Pre vs. Post</div>
+        <p style="font-size:13px;color:var(--slate);margin-bottom:1rem;line-height:1.6">Gray = pre-training confidence. Navy = post-training confidence. The outer ring represents a score of 5.0.</p>
+        ${radarSVG}
+      </div>
+      <div class="card" style="background:rgba(27,43,94,.03)">
+        <div class="tag">Score Interpretation</div>
+        ${[["1.0–2.4","Low confidence","#FCEBEB","#791F1F"],["2.5–3.4","Moderate confidence","#FAEEDA","#633806"],["3.5–4.4","High confidence","#EAF3DE","#27500A"],["4.5–5.0","Very high confidence","#E6F1FB","#0C447C"]].map(([r,l,bg,tc])=>`
+        <div class="interp-row"><div class="interp-badge" style="background:${bg};color:${tc}">${r}</div><div class="interp-desc">${l}</div></div>`).join("")}
+      </div>`;
+  }
+  else if(activeTab==="decisions") {
+    const aCards=patterns.map(p=>`<div class="acard"><div class="atitle">${PATTERN_LABELS[p]||p}</div><div class="abody">${ADAPTIVE[p]}</div></div>`).join("");
+    const scCards=STATE.scenarioResults.map(sr=>{
+      const sc=SCENARIOS.find(s=>s.id===sr.scenarioId); if(!sc)return"";
+      const decCards=sr.responses.map((r,i)=>{
+        const opt=sc.decisions[i]?.options.find(o=>o.id===r.selectedOptionId);
+        const bg=r.cls==="optimal"||r.classification==="optimal"?"#EAF3DE":r.cls==="partial"||r.classification==="partial"?"#FAEEDA":"#FCEBEB";
+        const tc=r.cls==="optimal"||r.classification==="optimal"?"#27500A":r.cls==="partial"||r.classification==="partial"?"#633806":"#791F1F";
+        const snippet=r.reasoningText?`<div style="font-size:11px;color:#6B7280;margin-top:.2rem;font-style:italic">"${r.reasoningText.slice(0,70)}${r.reasoningText.length>70?"...":""}"</div>`:"";
+        return `<div style="flex:1 1 160px;background:${bg};border-radius:8px;padding:.65rem"><div style="font-size:10px;font-weight:700;color:${tc};text-transform:uppercase;letter-spacing:.07em;margin-bottom:.2rem">Decision ${i+1}</div><div style="font-size:12px;color:var(--navy);font-weight:600;margin-bottom:.15rem">${opt?.label||""}</div><div style="font-size:11px;color:#6B7280">Conf: ${r.confidence}/100</div>${snippet}</div>`;
+      }).join("");
+      return `<div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;gap:1rem;margin-bottom:1rem;align-items:flex-start">
+          <div style="width:72px;height:46px;border-radius:8px;overflow:hidden;flex-shrink:0">${ILLUSTRATIONS[sc.id]}</div>
+          <div style="flex:1"><div class="tag" style="margin-bottom:.2rem">${sc.title}</div><div style="font-size:13px;color:var(--slate)">${sc.introFocus}</div></div>
+          <div style="text-align:right;flex-shrink:0"><div style="font-size:22px;font-family:var(--font-display);color:var(--navy);font-weight:700;line-height:1">${Math.round(sr.scenarioAccuracyScore*100)}%</div><div style="font-size:11px;color:#9AA3B0">accuracy</div></div>
+        </div>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">${decCards}</div>
+      </div>`;
+    }).join("");
+    content=`
+      <div class="rgrid">
+        <div class="sstat"><div class="snum">${STATE.completedIds.length}</div><div class="slbl">Scenarios Completed</div></div>
+        <div class="sstat"><div class="snum">${accPct}%</div><div class="slbl">Optimal Decisions</div></div>
+        <div class="sstat"><div class="snum">${avgConf}</div><div class="slbl">Avg Confidence</div></div>
+      </div>
+      <div style="margin-bottom:1.75rem">
+        <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:.5rem">${optimal} of ${total} decisions were the most responsible choice</div>
+        <div class="atrack"><div class="afill" style="width:${accPct}%"></div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="eyebrow" style="margin-bottom:.75rem">Adaptive Feedback</div>
+      ${aCards}
+      <div class="divider"></div>
+      <div class="eyebrow" style="margin-bottom:.75rem">By Scenario</div>
+      ${scCards}`;
+  }
+  else if(activeTab==="openended") {
+    content=OE_ITEMS.map(item=>{
+      const resp=(STATE.openEnded||{})[item.id]||"";
+      return `<div class="card" style="margin-bottom:1rem">
+        <div class="tag">${item.id} · ${item.construct}</div>
+        <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:.75rem;line-height:1.5">${item.text}</div>
+        ${resp.trim()?`<div style="font-size:14px;color:#374151;line-height:1.7;background:#F7F4EF;border-radius:10px;padding:.9rem 1rem;font-style:italic">"${resp}"</div>`:`<div style="font-size:13px;color:#9AA3B0;font-style:italic">No response provided.</div>`}
+      </div>`;
+    }).join("");
+  }
+
+  document.getElementById("screen-results").innerHTML = `
+  <div class="narrow fi">
+    <div class="eyebrow">Step 4 of 4 — Complete</div>
+    <h1 class="display" style="font-size:30px">Your Results</h1>
+    <p class="lead" style="margin-bottom:2rem">Pre/post confidence scores, your decision profile, and adaptive feedback — all in one place.</p>
+    ${tabs}
+    ${content}
+    <div style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid rgba(27,43,94,.08)">
+      <button class="ghost" onclick="resetAll()">Reset all progress and start over</button>
+    </div>
+  </div>`;
+}
+
+function resetAll() {
+  if(!confirm("Reset all progress? This cannot be undone.")) return;
+  STATE = freshState(); saveState();
+  renderWelcome(); showScreen("welcome");
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+
+function init() {
+  renderWelcome();
+  // Resume from saved state
+  const stage = STATE.stage;
+  if(stage==="welcome" || !stage) { showScreen("welcome"); return; }
+  if(stage==="demographics") { renderDemographics(); showScreen("demographics"); }
+  else if(stage==="presurvey") { renderLikert("pre"); showScreen("presurvey"); }
+  else if(stage==="scenarios") { renderScenarioDashboard(); showScreen("scenarios"); }
+  else if(stage==="postsurvey") { renderLikert("post"); showScreen("postsurvey"); }
+  else if(stage==="openended") { renderOpenEnded(); showScreen("openended"); }
+  else if(stage==="results") { renderResults("survey"); showScreen("results"); }
+  else { showScreen("welcome"); }
+}
+
+init();
+</script>
+</body>
+</html>
